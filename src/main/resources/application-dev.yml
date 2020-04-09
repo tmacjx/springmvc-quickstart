@@ -1,0 +1,35 @@
+server:
+  port: 8080
+  undertow:
+    accesslog:
+      enabled: true
+      dir: undertow-log
+      prefix: access_log
+      pattern:  '[%{time,yyyy-MM-dd HH:mm:ss.S z}] %b %l %u %I %v %a %m %U %s (%D ms)'
+      rotate: true
+      suffix: .log
+    buffer-size: 1024
+    worker-threads: 20
+    direct-buffers: true
+
+logging:
+  config: classpath:log4j2-testing.yml
+  path: ./.log
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=utf-8&autoReconnect=true&failOverReadOnly=false&jdbcCompliantTruncation=false&allowMultiQueries=true&useAffectedRows=true
+    username: root
+    password: 123456
+    driverClassName: com.mysql.jdbc.Driver
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      read-only: false
+      idle-timeout: 300000
+      auto-commit: true
+      connection-test-query: SELECT 1
+      pool-name: HikariDataSource
