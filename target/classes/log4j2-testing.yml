@@ -1,0 +1,44 @@
+Configuration:
+  status: info
+  monitorInterval: 30
+
+  properties:
+    property:
+      - name: log_filename
+        value: "${sys:LOG_PATH}/application.log"
+
+  Appenders:
+    RollingFile:
+      name: "serviceAppender"
+      fileName: "${log_filename}"
+      filePattern: "${sys:LOG_PATH}/application-%d{yyyy-MM-dd}_%i.log"
+      PatternLayout:
+        Pattern: "%d %p %c{1.} [%t] %C{1} %M %L %m %ex%n"
+      Policies:
+        TimeBasedTriggeringPolicy:
+          modulate: "true"
+          interval: "1"
+        SizeBasedTriggeringPolicy:
+          size: "20 MB"
+      DefaultRolloverStrategy:
+        max: 20
+
+    Console:
+      name: "consoleAppender"
+      target: "SYSTEM_OUT"
+      PatternLayout:
+        Pattern: "%d %p %c{1.} [%t] %C{1} %M %L %m %ex%n"
+
+  Loggers:
+    Logger:
+      name: "service"
+      level: "info"
+      additivity: "false"
+      AppenderRef:
+        ref: "serviceAppender"
+
+    Root:
+      level: "info"
+      AppenderRef:
+        - ref: "serviceAppender"
+        - ref: "consoleAppender"

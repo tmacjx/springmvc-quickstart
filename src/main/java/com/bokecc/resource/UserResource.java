@@ -7,15 +7,17 @@ import com.bokecc.param.UserParam;
 import com.bokecc.service.IuserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import javax.ws.rs.core.MediaType;
 import java.util.List;
 
+@Slf4j
 @RestController
-@RequestMapping("/user")
-@Api(value = "user-resource", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+@RequestMapping("/api/user")
+@Api(value = "user-resource", produces = MediaType.APPLICATION_JSON)
 public class UserResource {
 
     @Autowired

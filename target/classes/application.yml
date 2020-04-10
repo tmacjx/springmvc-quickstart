@@ -1,0 +1,24 @@
+spring:
+  profiles:
+    active: dev
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    property-naming-strategy: SNAKE_CASE
+    time-zone: GMT+8
+  application:
+    name: jerseydemo
+
+management:
+  endpoint:
+    shutdown:
+      enabled: false
+  health:
+    redis:
+      enabled: false
+    rabbit:
+      enabled: false
+
+mybatis-plus:
+  mapper-locations: classpath:/mapper/*Mapper.xml
+  typeAliasesPackage: com.bokecc.model
+
