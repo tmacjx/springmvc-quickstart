@@ -1,0 +1,8 @@
+com/bokecc/Application.class
+com/bokecc/model/User.class
+com/bokecc/param/UserParam.class
+com/bokecc/service/IuserService.class
+com/bokecc/mapper/UserMapper.class
+com/bokecc/service/impl/UserServiceImpl.class
+com/bokecc/config/SwaggerConfig.class
+com/bokecc/resource/UserResource.class

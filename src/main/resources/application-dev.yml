@@ -33,3 +33,7 @@ spring:
       auto-commit: true
       connection-test-query: SELECT 1
       pool-name: HikariDataSource
+
+swagger:
+  enable: true
+

@@ -21,4 +21,3 @@ management:
 mybatis-plus:
   mapper-locations: classpath:/mapper/*Mapper.xml
   typeAliasesPackage: com.bokecc.model
-
