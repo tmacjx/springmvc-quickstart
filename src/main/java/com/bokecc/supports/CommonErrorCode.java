@@ -12,7 +12,7 @@ import lombok.ToString;
  */
 @Getter
 @ToString
-public enum CommonErrorCode implements IErrorCode{
+public enum CommonErrorCode implements IErrorCode {
 	/**
 	 * 操作成功
 	 */

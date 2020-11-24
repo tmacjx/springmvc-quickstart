@@ -1,13 +1,10 @@
 package com.bokecc.filter;
 
-import com.bokecc.constant.Constant;
-import com.bokecc.supports.RestResponse;
-import com.bokecc.supports.ResultCode;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerResponseContext;
-import javax.ws.rs.container.ContainerResponseFilter;
+import javax.servlet.*;
+import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 
 /**
@@ -16,79 +13,27 @@ import java.io.IOException;
  **/
 
 @Slf4j
-public class CorsFilter implements ContainerResponseFilter {
-
-
-
-    private static final String HTTP_METHOD = "OPTIONS";
-
-
-    private static final String ORIGIN = "Origin";
-
-    // private static final String ALLOW_ORIGIN_KEY = "app-config.allow-origin";
-    // private static Set<String> allowSet = new HashSet<>(10);
-    // static{
-    //
-    //        String active = PropertiesObtainConfig.env.getProperty(ALLOW_ORIGIN_KEY);
-    //
-    //        if(null != active) {
-    //
-    //            String[] arr = active.split(",");
-    //
-    //            if(arr.length > 0){
-    //
-    //                for(String host:arr){
-    //
-    //                    allowSet.add(host.trim());
-    //                }
-    //            }
-    //        }
-    //
-    //  }
+public class CorsFilter implements Filter {
 
     @Override
-    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
+    public void init(FilterConfig filterConfig) throws ServletException {
 
-        cross(requestContext, responseContext);
-
-        Object entity = responseContext.getEntity();
-
-        if(entity instanceof RestResponse) {
-
-            RestResponse response = (RestResponse) responseContext.getEntity();
-
-            if (null != response.getCode() && !response.getCode().equals(ResultCode.UNKNOWN_ERROR.getCode())) {
-
-                responseContext.setStatus(Constant.ERROR_HTTP_CODE);
-            }
-        }
     }
 
-    /**
-     * 跨域
-     * @param requestContext request
-     * @param responseContext response
+    @Override
+    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
 
-     */
-    private void cross(ContainerRequestContext requestContext, ContainerResponseContext responseContext){
+        HttpServletResponse response = (HttpServletResponse) servletResponse;
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Methods", "POST, GET");
+        response.setHeader("Access-Control-Max-Age", "3600");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+        filterChain.doFilter(servletRequest, servletResponse);
 
-        if(HTTP_METHOD.equalsIgnoreCase(requestContext.getMethod())) {
+    }
 
-            responseContext.setStatus(200);
-        }
+    @Override
+    public void destroy() {
 
-
-        String origin = requestContext.getHeaderString(ORIGIN);
-
-        responseContext.getHeaders().add("Access-Control-Allow-Origin", origin);
-
-        responseContext.getHeaders().add("Access-Control-Allow-Headers", "*");
-
-        responseContext.getHeaders().add("Access-Control-Allow-Credentials", "true");
-
-        responseContext.getHeaders().add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD");
-
-        //CORS策略的缓存时间
-        responseContext.getHeaders().add("Access-Control-Max-Age", "86400");
     }
 }

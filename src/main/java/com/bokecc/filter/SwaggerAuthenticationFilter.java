@@ -5,19 +5,21 @@ import com.bokecc.config.PropertiesObtainConfig;
 import com.bokecc.constant.Constant;
 import com.bokecc.util.Base64Util;
 import lombok.extern.slf4j.Slf4j;
-import org.glassfish.jersey.server.ContainerRequest;
 
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
+import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 
 @Slf4j
-public class SwaggerAuthenticationFilter implements ContainerRequestFilter {
+public class SwaggerAuthenticationFilter implements Filter {
 
     private static final String AUTHORIZATION_PROPERTY = "Authorization";
 
@@ -28,43 +30,6 @@ public class SwaggerAuthenticationFilter implements ContainerRequestFilter {
     private static final String ACTIVE_FLAG_DEV = "dev";
 
     private static final String AUTH_URL = "swagger.json";
-
-    @Override
-    public void filter(ContainerRequestContext requestContext) throws IOException {
-
-        ContainerRequest request = (ContainerRequest) requestContext.getRequest();
-
-        String url = request.getPath(false);
-
-        if(!url.equals(AUTH_URL)){
-
-            return;
-        }
-
-        final MultivaluedMap<String, String> headers = requestContext.getHeaders();
-
-        final List<String> authorization = headers.get(AUTHORIZATION_PROPERTY);
-
-        if(authorization == null || authorization.isEmpty())
-        {
-            requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
-                    .header("WWW-Authenticate", "Basic realm=\"input username and password\"").build());
-            return;
-        }
-
-        log.debug(JSON.toJSONString(authorization));
-
-        if(!auth(authorization.get(0))){
-
-            requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
-                    .header("WWW-Authenticate", "Basic realm=\"input username and password\"")
-                    .entity("认证失败")
-                    .build());
-            return;
-        }
-
-        log.debug("通过");
-    }
 
     /**
      * 认证方法体
@@ -103,5 +68,60 @@ public class SwaggerAuthenticationFilter implements ContainerRequestFilter {
 
         return Constant.BASIC_AUTH_USER.equals(userName)
                 && Constant.BASIC_AUTH_PW_ONLINE.equals(pw);
+    }
+
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+
+    }
+
+    @Override
+    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+
+        HttpServletRequest request = (HttpServletRequest) servletRequest;
+        HttpServletResponse response = (HttpServletResponse) servletResponse;
+
+        String url = request.getRequestURL().toString();
+
+        if(!url.equals(AUTH_URL)){
+
+            return;
+        }
+
+        Map<String, List<String>> headers = Collections.list(request.getHeaderNames())
+                .stream()
+                .collect(Collectors.toMap(
+                        Function.identity(),
+                        h -> Collections.list(request.getHeaders(h))
+                ));
+
+        final List<String> authorization = headers.get(AUTHORIZATION_PROPERTY);
+
+        if(authorization == null || authorization.isEmpty())
+        {
+
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setHeader("WWW-Authenticate", "Basic realm=\"input username and password\"");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+
+        log.debug(JSON.toJSONString(authorization));
+
+        if(!auth(authorization.get(0))){
+
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setHeader("WWW-Authenticate", "Basic realm=\"input username and password\"");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+
+
+        log.debug("通过");
+    }
+
+    @Override
+    public void destroy() {
+
     }
 }

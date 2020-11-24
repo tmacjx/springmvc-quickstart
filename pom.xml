@@ -26,6 +26,8 @@
     <swagger.version>2.7.0</swagger.version>
     <fastjson.version>1.2.28</fastjson.version>
     <lombok.version>1.16.20</lombok.version>
+    <jwt-version>0.7.0</jwt-version>
+
 </properties>
 
 <dependencies>
@@ -54,6 +56,12 @@
         <groupId>javax.ws.rs</groupId>
         <artifactId>javax.ws.rs-api</artifactId>
         <version>2.0</version>
+    </dependency>
+
+    <dependency>
+        <groupId>io.jsonwebtoken</groupId>
+        <artifactId>jjwt</artifactId>
+        <version>${jwt-version}</version>
     </dependency>
 
     <dependency>
